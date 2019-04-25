@@ -79,12 +79,16 @@ class QuotesDetailState extends State<QuotesDetail> {
               margin: EdgeInsets.only(top: 15),
               color: Colors.grey[300],
             ),
+            menuBar(),
+            exchangeInfo(),
+            chartInfo()
           ],
         ),
       ),
     );
   }
 
+  bool isCollection=false;
   Widget topDetail() {
     return new Container(
       child: new Column(
@@ -109,11 +113,11 @@ class QuotesDetailState extends State<QuotesDetail> {
                   child: new Container(
                 alignment: Alignment.centerRight,
                 child: new IconButton(
-                  color: Colors.grey,
-                  icon: new Icon(Icons.star_border),
-                  onPressed: () => {
-                  _showSnackBar(context, "sdasd")
-                  },
+                  color:isCollection?Colors.yellow: Colors.grey,
+                  icon: new Icon(isCollection?Icons.star:Icons.star_border),
+                  onPressed:() =>  setState(() {
+                    isCollection=!isCollection;
+                  }),
                 ),
               ))
             ],
@@ -184,8 +188,7 @@ class QuotesDetailState extends State<QuotesDetail> {
   }
 
   //是否显示简介
-  bool _isShowIntroduction = true;
-
+  bool _isShowIntroduction = false;
   Widget _Introduction(String coinName, String introduction) {
     return new Container(
         padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
@@ -208,7 +211,9 @@ class QuotesDetailState extends State<QuotesDetail> {
                             style: TextStyle(color: Colors.deepPurpleAccent),
                           ),
                         ),
-                        onTap: () => isShowIntroduction(),
+                        onTap: () => setState(() {
+                              _isShowIntroduction = !_isShowIntroduction;
+                            }),
                       )
                     ],
                   ),
@@ -216,23 +221,84 @@ class QuotesDetailState extends State<QuotesDetail> {
               ],
             ),
             new Offstage(
-              offstage:!_isShowIntroduction ,
-              child:
-              new Text(introduction),
+              offstage: !_isShowIntroduction,
+              child: new Container(
+                color: Colors.blue[100],
+                child: new Text(introduction),
+              ),
             )
           ],
         ));
   }
 
-  isShowIntroduction() {
-    setState(() {
-      print(_isShowIntroduction.toString());
-      _isShowIntroduction = !_isShowIntroduction;
-    });
+  bool isShowChart = false;
+  Widget menuBar() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+            child: GestureDetector(
+          child: Container(
+              color: Colors.white,
+              padding: EdgeInsets.only(top: 5, bottom: 5),
+              child: new Column(
+                children: <Widget>[
+                  Text(
+                    "交易所行情",
+                    style: TextStyle(
+                        color: isShowChart ? Colors.black : Colors.purple),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 5),
+                    height: 1,
+                    width: 50,
+                    color: isShowChart ? Colors.white : Colors.purple,
+                  ),
+                ],
+              )),
+          onTap: () => setState(() {
+                isShowChart = false;
+              }),
+        )),
+        Expanded(
+            child: GestureDetector(
+          child: Container(
+              color: Colors.white,
+              padding: EdgeInsets.only(top: 5, bottom: 5),
+              child: new Column(
+                children: <Widget>[
+                  Text(
+                    "交易图表",
+                    style: TextStyle(
+                        color: isShowChart ? Colors.purple : Colors.black),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 5),
+                    height: 1,
+                    width: 50,
+                    color: isShowChart ? Colors.purple : Colors.white,
+                  ),
+                ],
+              )),
+          onTap: () => setState(() {
+                isShowChart = true;
+              }),
+        )),
+      ],
+    );
   }
 
-  void _showSnackBar(BuildContext context, String text) {
-    Scaffold.of(context).showSnackBar(SnackBar(content: new Text(text)));
+  Widget exchangeInfo(){
+    return Offstage(
+      offstage: isShowChart,
+      child: Text("交易所数据"),
+    );
+
+  }
+  Widget chartInfo(){
+    return Offstage(
+      offstage: !isShowChart,
+      child: Text("图表"),
+    );
   }
 
   IconData _formateIcon(String value) {

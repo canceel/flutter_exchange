@@ -5,6 +5,9 @@ import 'package:flutter_exchange/contants/Api.dart';
 import 'package:flutter_exchange/exchange/matrix/Quotes.dart';
 import 'package:flutter_exchange/exchange/HomeMenu.dart';
 import 'package:flutter_exchange/exchange/matrix/QuotesDetail.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_exchange/widget/LoadingDialog.dart';
+
 
 void main() => runApp(MyIndex());
 
@@ -18,7 +21,8 @@ class MyIndex extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: '行情'),
-      routes: <String, WidgetBuilder>{ // 路由
+      routes: <String, WidgetBuilder>{
+        // 路由
         '/quotesDetail': (BuildContext context) => new QuotesDetail()
       },
     );
@@ -33,25 +37,46 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+SlidableController slidableController;
+
 class _MyHomePageState extends State<MyHomePage> {
   String currentData = "init";
 
   void _incrementCounter() {
     setState(() {
-      refreshDataFromNet();
+      refreshDataFromNet(mContext);
     });
   }
 
   @override
   void initState() {
-    refreshDataFromNet();
+    slidableController = new SlidableController(
+      onSlideAnimationChanged: handleSlideAnimationChanged,
+      onSlideIsOpenChanged: handleSlideIsOpenChanged,
+    );
+    super.initState();
   }
 
-  BuildContext mContext;
+  Animation<double> _rotationAnimation;
+  Color _fabColor = Colors.blue;
 
+  void handleSlideAnimationChanged(Animation<double> slideAnimation) {
+    setState(() {
+      _rotationAnimation = slideAnimation;
+    });
+  }
+
+  void handleSlideIsOpenChanged(bool isOpen) {
+    setState(() {
+      _fabColor = isOpen ? Colors.green : Colors.blue;
+    });
+  }
+
+  var mContext;
   @override
   Widget build(BuildContext context) {
     mContext = context;
+    refreshDataFromNet(context);
     return Scaffold(
       backgroundColor: Colors.grey,
       appBar: AppBar(
@@ -64,23 +89,47 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
+        backgroundColor: _fabColor,
         tooltip: 'Increment',
-        child: Icon(Icons.threesixty),
+        child: _rotationAnimation == null
+            ? Icon(Icons.threesixty)
+            : RotationTransition(
+                turns: _rotationAnimation,
+                child: Icon(Icons.threesixty),
+              ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
   var datas;
-  void refreshDataFromNet() {
+  void refreshDataFromNet(BuildContext context) {
+//    showLoading(context);
     HttpCore.instance.get(Api.tickers, (data) {
+//      dismissLoading(context);
       countDown();
       setState(() {
         datas = MatrixData.fromJson(data).result;
-        print( MatrixData.fromJson(data).result[0].usdPercentChange24h);
+        print(MatrixData.fromJson(data).result[0].usdPercentChange24h);
       });
     }, errorCallBack: (error) {
+//      dismissLoading(context);
       print(error.toString());
     });
+  }
+
+  void showLoading(BuildContext context){
+    showDialog<Null>(
+        context: context, //BuildContext对象
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return new LoadingDialog( //调用对话框
+            text: 'Loading...',
+          );
+        });
+  }
+
+  void dismissLoading(BuildContext context){
+    Navigator.pop(context);
   }
 
   Widget exchangeItem() {
@@ -95,8 +144,11 @@ class _MyHomePageState extends State<MyHomePage> {
         physics: ScrollPhysics(),
         itemCount: datas.length,
         itemBuilder: (context, index) => Container(
-          child: Quotes(matrixResult: datas[index]),
-        ));
+              child: Quotes(
+                matrixResult: datas[index],
+                slidableController: slidableController,
+              ),
+            ));
   }
 
   void countDown() {

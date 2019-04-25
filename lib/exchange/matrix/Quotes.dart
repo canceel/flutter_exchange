@@ -7,9 +7,11 @@ class Quotes extends StatefulWidget {
   const Quotes({
     Key key,
     this.matrixResult,
+    this.slidableController,
   })  : assert(matrixResult != null),
         super(key: key);
   final MatrixResult matrixResult;
+  final SlidableController slidableController;
 
   @override
   State<StatefulWidget> createState() {
@@ -18,63 +20,36 @@ class Quotes extends StatefulWidget {
 }
 
 class QuotesState extends State<Quotes> {
-  SlidableController slidableController;
-
-  @override
-  void initState() {
-    slidableController = new SlidableController(
-      onSlideAnimationChanged: handleSlideAnimationChanged,
-      onSlideIsOpenChanged: handleSlideIsOpenChanged,
-    );
-    super.initState();
-  }
-
-  Animation<double> _rotationAnimation;
-  Color _fabColor = Colors.blue;
-
-  void handleSlideAnimationChanged(Animation<double> slideAnimation) {
-    setState(() {
-      _rotationAnimation = slideAnimation;
-    });
-  }
-
-  void handleSlideIsOpenChanged(bool isOpen) {
-    setState(() {
-      _fabColor = isOpen ? Colors.green : Colors.blue;
-    });
-  }
-
   MatrixResult matrixResult;
+  SlidableController slidableController;
 
   @override
   Widget build(BuildContext context) {
     matrixResult = widget.matrixResult;
-    return  _getSlidableWithLists(context);
+    slidableController = widget.slidableController;
+    return _getSlidableWithLists(context);
   }
 
   Widget _getSlidableWithLists(BuildContext context) {
     return new Slidable(
       key: new Key(matrixResult.symbol),
+      controller: slidableController,
       direction: Axis.horizontal,
-      slideToDismissDelegate: new SlideToDismissDrawerDelegate(
-        closeOnCanceled: false,
-        onDismissed: (actionType) {
-          _showSnackBar(
-              context,
-              actionType == SlideActionType.primary
-                  ? 'Dismiss Archive'
-                  : 'Dimiss Delete');
-        },
-      ),
-      delegate: SlidableBehindDelegate(),
+      delegate: SlidableStrechDelegate(),
       actionExtentRatio: 0.25,
       child: _QuotesItem(),
       secondaryActions: <Widget>[
         new IconSlideAction(
-          caption: 'Collection',
+          caption: 'star',
           color: Colors.red,
           icon: Icons.star,
-          onTap: () => _showSnackBar(context, 'Collection'),
+          onTap: () => _showSnackBar(context, 'star'),
+        ),
+        new IconSlideAction(
+          caption: 'style',
+          color: Colors.yellow,
+          icon: Icons.style,
+          onTap: () => _showSnackBar(context, 'style'),
         ),
       ],
     );
@@ -143,7 +118,8 @@ class QuotesState extends State<Quotes> {
                         matrixResult.marketcap.toString(),
                         style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: formateColor(matrixResult.usdPercentChange24h.toString())),
+                            color: formateColor(
+                                matrixResult.usdPercentChange24h.toString())),
                       ),
                       Text(
                         "¥_",
@@ -158,7 +134,8 @@ class QuotesState extends State<Quotes> {
               ],
             )),
             Container(
-                color: formateColor(matrixResult.usdPercentChange24h.toString()),
+                color:
+                    formateColor(matrixResult.usdPercentChange24h.toString()),
                 height: 30,
                 width: 70,
                 alignment: Alignment.center,
@@ -214,7 +191,7 @@ class QuotesState extends State<Quotes> {
     if (value.isNotEmpty) {
       if (value.startsWith("-")) {
         color = Colors.green;
-      } else if (value=="0") {
+      } else if (value == "0") {
         color = Colors.grey[400];
       } else {
         color = Colors.red;
