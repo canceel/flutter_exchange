@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       ),
       home: MyHomePage(title: '行情'),
       routes: <String, WidgetBuilder>{ // 路由
-      '/quotesDetail': (BuildContext context) => new QUotesDetail()
+      '/quotesDetail': (BuildContext context) => new QuotesDetail()
     },
     );
   }

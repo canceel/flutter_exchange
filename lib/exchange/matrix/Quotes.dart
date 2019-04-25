@@ -88,7 +88,7 @@ class QuotesState extends State<Quotes> {
     return new GestureDetector(
       onTap: () =>
           Navigator.push(context, new MaterialPageRoute(builder: (context) {
-            return QUotesDetail(matrixResult: matrixResult);
+            return QuotesDetail(matrixResult: matrixResult);
           })),
       child: Container(
         height: 60,

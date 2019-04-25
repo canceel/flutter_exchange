@@ -6,9 +6,9 @@ import 'package:flutter_exchange/exchange/matrix/Quotes.dart';
 import 'package:flutter_exchange/exchange/HomeMenu.dart';
 import 'package:flutter_exchange/exchange/matrix/QuotesDetail.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(MyIndex());
 
-class MyApp extends StatelessWidget {
+class MyIndex extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       ),
       home: MyHomePage(title: '行情'),
       routes: <String, WidgetBuilder>{ // 路由
-        '/quotesDetail': (BuildContext context) => new QUotesDetail()
+        '/quotesDetail': (BuildContext context) => new QuotesDetail()
       },
     );
   }

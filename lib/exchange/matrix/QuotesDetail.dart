@@ -5,19 +5,19 @@ import 'package:flutter_exchange/contants/Api.dart';
 import 'package:flutter_exchange/data/matrix/CoinDetail.dart';
 
 //TODO 币种详情K线等数据
-class QUotesDetail extends StatefulWidget {
-  const QUotesDetail({Key key, this.matrixResult})
+class QuotesDetail extends StatefulWidget {
+  const QuotesDetail({Key key, this.matrixResult})
       : assert(matrixResult != null),
         super(key: key);
   final MatrixResult matrixResult;
 
   @override
   State<StatefulWidget> createState() {
-    return QUotesDetailState();
+    return QuotesDetailState();
   }
 }
 
-class QUotesDetailState extends State<QUotesDetail> {
+class QuotesDetailState extends State<QuotesDetail> {
   var params;
 
   void getDetailInfo() {
