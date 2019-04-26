@@ -6,8 +6,6 @@ import 'package:flutter_exchange/exchange/matrix/Quotes.dart';
 import 'package:flutter_exchange/exchange/HomeMenu.dart';
 import 'package:flutter_exchange/exchange/matrix/QuotesDetail.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_exchange/widget/LoadingDialog.dart';
-
 
 void main() => runApp(MyIndex());
 
@@ -42,18 +40,13 @@ SlidableController slidableController;
 class _MyHomePageState extends State<MyHomePage> {
   String currentData = "init";
 
-  void _incrementCounter() {
-    setState(() {
-      refreshDataFromNet(mContext);
-    });
-  }
-
   @override
   void initState() {
     slidableController = new SlidableController(
       onSlideAnimationChanged: handleSlideAnimationChanged,
       onSlideIsOpenChanged: handleSlideIsOpenChanged,
     );
+    refreshDataFromNet();
     super.initState();
   }
 
@@ -72,11 +65,17 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _incrementCounter() {
+    setState(() {
+      refreshDataFromNet();
+    });
+  }
+
   var mContext;
+
   @override
   Widget build(BuildContext context) {
     mContext = context;
-    refreshDataFromNet(context);
     return Scaffold(
       backgroundColor: Colors.grey,
       appBar: AppBar(
@@ -102,34 +101,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   var datas;
-  void refreshDataFromNet(BuildContext context) {
-//    showLoading(context);
+
+  void refreshDataFromNet() {
     HttpCore.instance.get(Api.tickers, (data) {
-//      dismissLoading(context);
       countDown();
       setState(() {
         datas = MatrixData.fromJson(data).result;
         print(MatrixData.fromJson(data).result[0].usdPercentChange24h);
       });
     }, errorCallBack: (error) {
-//      dismissLoading(context);
       print(error.toString());
     });
-  }
-
-  void showLoading(BuildContext context){
-    showDialog<Null>(
-        context: context, //BuildContext对象
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return new LoadingDialog( //调用对话框
-            text: 'Loading...',
-          );
-        });
-  }
-
-  void dismissLoading(BuildContext context){
-    Navigator.pop(context);
   }
 
   Widget exchangeItem() {
@@ -152,7 +134,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void countDown() {
-//    var _duration = new Duration(seconds: 1);
+//    var _duration = new Duration(seconds: 3);
 //    new Future.delayed(_duration, refreshDataFromNet);
   }
 }
+
+

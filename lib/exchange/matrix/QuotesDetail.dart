@@ -20,11 +20,19 @@ class QuotesDetail extends StatefulWidget {
 class QuotesDetailState extends State<QuotesDetail> {
   var params;
 
+//  void showLoadingDialog(BuildContext context) {
+//    showDialog(
+//        context: context,
+//        barrierDismissible: false,
+//        builder: (context) {
+//          return new LoadingDialog();
+//        });
+//  }
+
   void getDetailInfo() {
     HttpCore.instance.get(Api.CCOIN_BASE_INFO, (data) {
       setState(() {
         coinDetail = CoinDetail.fromJson(data["Result"][0]);
-//        print(coinDetail.toString());
       });
     }, errorCallBack: (error) {
       print(error.toString());

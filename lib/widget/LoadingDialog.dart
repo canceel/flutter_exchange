@@ -1,45 +1,50 @@
 import 'package:flutter/material.dart';
- class LoadingDialog extends Dialog {
-   String text;
 
-   LoadingDialog({Key key, @required this.text}) : super(key: key);
+class LoadingDialog extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    Duration insetAnimationDuration = const Duration(milliseconds: 100);
+    Curve insetAnimationCurve = Curves.decelerate;
 
-   @override
-   Widget build(BuildContext context) {
-     return new Material( //创建透明层
-       type: MaterialType.transparency, //透明类型
-       child: new Center( //保证控件居中效果
-         child: new SizedBox(
-           width: 120.0,
-           height: 120.0,
-           child: new Container(
-             decoration: ShapeDecoration(
-               color: Color(0xffffffff),
-               shape: RoundedRectangleBorder(
-                 borderRadius: BorderRadius.all(
-                   Radius.circular(8.0),
-                 ),
-               ),
-             ),
-             child: new Column(
-               mainAxisAlignment: MainAxisAlignment.center,
-               crossAxisAlignment: CrossAxisAlignment.center,
-               children: <Widget>[
-                 new CircularProgressIndicator(),
-                 new Padding(
-                   padding: const EdgeInsets.only(
-                     top: 20.0,
-                   ),
-                   child: new Text(
-                     text,
-                     style: new TextStyle(fontSize: 12.0),
-                   ),
-                 ),
-               ],
-             ),
-           ),
-         ),
-       ),
-     );
-   }
- }
+    RoundedRectangleBorder _defaultDialogShape = RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(2.0)));
+
+    return AnimatedPadding(
+      padding: MediaQuery.of(context).viewInsets +
+          const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+      duration: insetAnimationDuration,
+      curve: insetAnimationCurve,
+      child: MediaQuery.removeViewInsets(
+        removeLeft: true,
+        removeTop: true,
+        removeRight: true,
+        removeBottom: true,
+        context: context,
+        child: Center(
+          child: SizedBox(
+            width: 120,
+            height: 120,
+            child: Material(
+              elevation: 24.0,
+              color: Theme.of(context).dialogBackgroundColor,
+              type: MaterialType.card,
+              child: new Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  new CircularProgressIndicator(),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: new Text("加载中"),
+                  ),
+                ],
+              ),
+              shape: _defaultDialogShape,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
